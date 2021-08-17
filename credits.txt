@@ -1,0 +1,4 @@
+Various pages and discussions on nesdev, for help with coding.
+Micheal Chiaramonte, for his Zero Pages series and NES Programming streams.
+Nintendo, for the NES, obviously.
+Graphics from https://opengameart.org/content/16x16-old-school-shooter-set
