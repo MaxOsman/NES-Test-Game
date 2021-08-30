@@ -1,8 +1,8 @@
 .segment "HEADER"
 .byte "NES"
 .byte $1a
-.byte $02 ; 2 * 16KB PRG ROM
-.byte $01 ; 1 * 8KB CHR ROM
+.byte $02           ; 2 * 16KB PRG ROM
+.byte $01           ; 1 * 8KB CHR ROM
 .byte %00000000
 .byte $00
 .byte $00
@@ -11,10 +11,13 @@
 .byte $00, $00, $00, $00, $00
 
 .include "testDefs.asm"
+.include "testGameLoop.asm"
+.include "testMaps.asm"
 .include "testReset.asm"
-.include "testNMI.asm"
 
 .segment "STARTUP"
+
+JSR LoadLevelMap
 
 GameLoop:
 
@@ -48,12 +51,13 @@ NMI:
     RTI
 
 PaletteData:
-  .byte     $0F, $00, $10, $20,     $0F, $0F, $0F, $0F,     $0F, $0F, $0F, $0F,    $0F, $0F, $0F, $0F   ; Backgrounds
-  .byte     $0F, $27, $16, $20,     $0F, $16, $26, $20,     $0F, $16, $19, $20,    $0F, $14, $25, $34   ; Sprites
+    .byte     $0F, $00, $10, $20,     $0F, $0F, $0F, $0F,     $0F, $0F, $0F, $0F,    $0F, $0F, $0F, $0F   ; Backgrounds
+    .byte     $0F, $27, $16, $20,     $0F, $16, $26, $20,     $0F, $16, $19, $20,    $0F, $14, $25, $34   ; Sprites
 
 SpriteData:
-  .byte $C8, $00, $00, $78
-  .byte $C8, $00, $40, $80 
+    .byte $00, $FD, $FD, $00
+    .byte $C8, $00, $00, $78
+    .byte $C8, $00, $40, $80 
 
 .segment "VECTORS"
     .word NMI

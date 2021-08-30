@@ -6,7 +6,7 @@ Reset:
     STX $4017
     LDX #$FF
     TXS
-    INX ; Fast X = 0
+    INX         ; Fast X = 0
 
     STX $2000
     STX $2001
@@ -52,22 +52,21 @@ LoadPalettes:
     CPX #$20
     BNE LoadPalettes
     LDX #$00
-
 LoadSprites:
     LDA SpriteData, X
     STA $0200, X
     INX
-    CPX #$08
+    CPX #$0C
     BNE LoadSprites   
 
-    LDA $0200
+    LDA PLAYER_SPRITE_1Y
     STA playerY
-    LDA $0203
+    LDA PLAYER_SPRITE_1X
     STA playerX
-
-    CLI
 
     LDA #%10110000
     STA $2000
     LDA #%00011110
     STA $2001
+
+    CLI
