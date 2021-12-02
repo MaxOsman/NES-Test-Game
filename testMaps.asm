@@ -25,12 +25,12 @@
 
 
 MapTest:
-	.byte	$01, $00, $01,		$00, $01, $00, $00,		$00, $00, $01, $00,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
+	.byte	$00, $00, $00,		$01, $00, $00, $00,		$00, $00, $00, $01,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
+	.byte	$00, $00, $00,		$01, $00, $00, $00,		$00, $00, $00, $01,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
-	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $01, $00,		$00, $00, $00
-	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
+	.byte	$00, $00, $00,		$01, $00, $00, $00,		$00, $00, $00, $01,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
 	.byte	$00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00, $00,		$00, $00, $00
@@ -38,56 +38,81 @@ MapTest:
 
 ; Y - iterate from start byte to last
 ; A - enemy type
-; 0 and 1 - jump address
-; 2 - number of enemies that have been processed so far
+; 2 - number of enemies that have been processed so far, 16
 ; 3 - Temp for transfers
 ; 4 - Row counter
 LoadLevelMap:
-	LDY #$00
-	STY work2
-	STY work4
+	ldy #$00
+	sty work2
+	sty work4
 LoadLevelLoop:
-	LDA MapTest, Y
-	BEQ LoadLevelIterate	; Skip if byte is $00
+	lda MapTest, Y
+	beq LoadLevelIterate	; Skip if byte is $00
 
-	LDX work2
-	STA enemyType, X
+	ldx work2
+	sta enemyType, X
+	; Initialise timer
+	stx work3
+	tax
+	lda InitTimers, X
+	stx work1
+	ldx work3
+	sty work3
+	jsr PRNG
+	lda seed0
+	and #%00000001
+	; Skip additional time if = 0
+	beq SkipRandom
+	clc
+	adc #$40
+SkipRandom:
+	sta enemyTimer, X
 
-	LDA work2
-	TAX
-	TYA
-	SEC
+	; Initialise HP
+	ldy work1
+	lda InitHP, Y
+	sta enemyHP, X
+	ldy work3
+
+	lda work2
+	tax
+	tya
+	sec
 PosLoop:
-	INC work4
-	SBC #$0E
-	BCS PosLoop				; Subtract row until at top
-	INC work4
-	ADC #$0F				; Re-add the last 0E, then add 1
-	ASL
-	ASL
-	ASL
-	ASL						; * 16 starting from 2nd position
-	ADC #$08
-	STA enemyX, X			; X can safely be overwritten since it is written every loop anyway, and its use for this loop is over
+	inc work4
+	sbc #$0E
+	bcs PosLoop				; Subtract row until at top
+	inc work4
+	adc #$0F				; Re-add the last 0E, then add 1
+	asl
+	asl
+	asl
+	asl						; * 16 starting from 2nd position
+	sta enemyX, X			; X can safely be overwritten since it is written every loop anyway, and its use for this loop is over
 
-	LDA work4
-	ASL
-	ASL
-	ASL
-	ASL
-	STA enemyY, X
+	lda work4
+	asl
+	asl
+	asl
+	asl
+	sta enemyY, X
 
-	LDA #$00
-	STA work4
+	lda #$00
+	sta work4
 
-	INC work2
-	LDA work2
-	CMP #$10				; 16 sprites
-	BEQ LoadLevelEnd		; If it has reached max capacity, end
+	inc work2
+	lda work2
+	cmp #$10				; 16 sprites
+	beq LoadLevelEnd		; If it has reached max capacity, end
 
 LoadLevelIterate:
-	INY
-	CPY #$7E				; $E * $9
-	BNE LoadLevelLoop		; If has not reached end of data, restart loop
+	iny
+	cpy #$7E				; $E * $9
+	bne LoadLevelLoop		; If has not reached end of data, restart loop
 LoadLevelEnd:
-	RTS
+	rts
+
+InitTimers:
+	.byte $00, $1F, $00, $00, $00, $00, $00, $00
+InitHP:
+	.byte $00, $07, $00, $00, $00, $00, $00, $00
