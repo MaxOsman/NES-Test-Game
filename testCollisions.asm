@@ -4,6 +4,9 @@
 ShotLoopNextJump:
 	jmp ShotLoopNext
 
+EnemyLoopNextJump:
+	jmp EnemyLoopNext
+
 Collisions:
 ; Increment Y first until end, then increment X by 1
 ; X - shot counter, Y - enemy counter, 0 - enemyY, 1 - enemyX, 2 to 4 - temp
@@ -15,7 +18,7 @@ ShotLoop:
 	beq ShotLoopNextJump	; If inactive (zero), skip detection and continue
 EnemyLoop:
 	lda enemyType, Y
-	beq EnemyLoopNext		; If inactive (zero), skip detection and continue
+	beq EnemyLoopNextJump		; If inactive (zero), skip detection and continue
 
 ; Detect collision
 ; Store centre Y coords
@@ -65,6 +68,14 @@ EnemyLoop:
 
 ; Collision response!
 	; Take damage
+	lda #$10
+	sta enemyFlashTimer, Y
+	sty work2
+	ldy	enemyType, X
+	lda InitPalettes, Y
+	ldy work2
+	sta enemyPalette, Y
+
 	lda enemyHP, Y
 	stx work2
 	ldx playerPower

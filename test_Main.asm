@@ -53,7 +53,7 @@ NMI:
 
 PaletteData:
     .byte     $0F, $00, $10, $20,     $0F, $0F, $0F, $0F,     $0F, $0F, $0F, $0F,    $0F, $0F, $0F, $0F   ; Backgrounds
-    .byte     $0F, $27, $16, $20,     $0F, $16, $26, $20,     $0F, $16, $19, $20,    $0F, $14, $25, $34   ; Sprites
+    .byte     $0F, $16, $27, $20,     $0F, $12, $21, $20,     $0F, $09, $29, $20,    $0F, $14, $25, $34   ; Sprites
 
 SpriteData:
     .byte $00, $FD, $FD, $00

@@ -68,11 +68,17 @@ LoadLevelLoop:
 SkipRandom:
 	sta enemyTimer, X
 
-	; Initialise HP
+	; Initialise HP/Palette
 	ldy work1
 	lda InitHP, Y
 	sta enemyHP, X
+	lda InitPalettes, Y
+	sta enemyPalette, X
 	ldy work3
+
+	; Initialise FlashTimer
+	lda #$00
+	sta enemyFlashTimer, X
 
 	lda work2
 	tax
@@ -116,3 +122,5 @@ InitTimers:
 	.byte $00, $1F, $00, $00, $00, $00, $00, $00
 InitHP:
 	.byte $00, $07, $00, $00, $00, $00, $00, $00
+InitPalettes:
+	.byte $00, $00

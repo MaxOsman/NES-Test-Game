@@ -64,6 +64,18 @@ RemoveEWeapon:
 
 MoveEnemy1:
 
+; Flash enemy if it has been hit
+	lda enemyFlashTimer, X
+	; Skip if timer has reached zero
+	beq SkipFlash
+
+	dec enemyFlashTimer, X
+	inc enemyPalette, X
+	lda enemyPalette, X
+	; Clamp to 0-3 range
+	and #%00000011
+	sta enemyPalette, X
+SkipFlash:
 ; Roll RNG, all enemies will need to do this so put it here
 	jsr PRNG
 
@@ -196,7 +208,7 @@ AssembleSprites:
 	stx work0
 	ldx enemyType, Y
 ContinueEnemyLoop:
-	sty work1
+	;sty work1
 	stx work2
 	lda EnemyTiles, X
 	asl work2
@@ -205,13 +217,16 @@ ContinueEnemyLoop:
 	sta ENEMY_SPRITE_2TILE, X
 	ldx work2
 	lda EnemyAttr, X
+	adc enemyPalette, Y
+	sta work3
 	inx
-	ldy EnemyAttr, X
+	lda EnemyAttr, X
+	adc enemyPalette, Y
 	ldx work0
-	sta ENEMY_SPRITE_1ATTR, X
-	tya
 	sta ENEMY_SPRITE_2ATTR, X
-	ldy work1
+	lda work3
+	sta ENEMY_SPRITE_1ATTR, X
+	;ldy work1
 
 	lda enemyY, Y
 	sta ENEMY_SPRITE_1Y, X
@@ -253,13 +268,16 @@ EndEnemyLoop:
 
 	rts
 
+; %00000010, %01000010
+; %00000001, %01000001
+
 EnemyTiles:
 	.byte $FE, $02, $0E, $1A, $00, $00, $00, $00
 EnemyAttr:
 	.byte %00000000, %00000000
 	.byte %00000000, %01000000
-	.byte %00000010, %01000010
-	.byte %00000001, %01000001
+	.byte %00000000, %01000000
+	.byte %00000000, %01000000
 	.byte %00000000, %00000000
 	.byte %00000000, %00000000
 	.byte %00000000, %00000000

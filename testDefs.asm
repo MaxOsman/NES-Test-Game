@@ -29,11 +29,12 @@ enemyHP = $50				; $50 to $60, 16
 enemyTimer = $60			; $60 to $70, 16
 enemyShotCooldown = $70		; $70 to $80, 16
 enemyFlashTimer = $80		; $80 to $90, 16
+enemyPalette = $90			; $90 to $A0, 16
 
-eweaponState = $90			; $90 to $A0, 16
+eweaponState = $A0			; $A0 to $B0, 16
 							; 0 means inactive, 1 means active
-eweaponY = $A0				; $A0 to $B0, 16
-eweaponX = $B0				; $B0 to $C0, 16
+eweaponY = $B0				; $B0 to $C0, 16
+eweaponX = $C0				; $C0 to $D0, 16
 
 work0 = $F0
 work1 = $F1
