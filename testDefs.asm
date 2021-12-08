@@ -25,6 +25,8 @@ enemyType = $40				; $40 to $50, 16
 							; 5 means big top-right
 							; 6 means big bottom-left
 							; 7 means big bottom-right
+							; 8 means explosion 1
+							; 9 means explosion 2
 enemyHP = $50				; $50 to $60, 16
 enemyTimer = $60			; $60 to $70, 16
 enemyShotCooldown = $70		; $70 to $80, 16
@@ -35,6 +37,9 @@ eweaponState = $A0			; $A0 to $B0, 16
 							; 0 means inactive, 1 means active
 eweaponY = $B0				; $B0 to $C0, 16
 eweaponX = $C0				; $C0 to $D0, 16
+
+playerPalette = $D0
+playerFlashTimer = $D1
 
 work0 = $F0
 work1 = $F1
@@ -56,8 +61,10 @@ BUTTON_RIGHT  = 1 << 0
 JOYPAD_1 = $4016
 
 PLAYER_SPRITE_1Y = $0204
+PLAYER_SPRITE_1ATTR = $0206
 PLAYER_SPRITE_1X = $0207
 PLAYER_SPRITE_2Y = $0208
+PLAYER_SPRITE_2ATTR = $020A
 PLAYER_SPRITE_2X = $020B
 
 PWEAPON_START_Y = $020C

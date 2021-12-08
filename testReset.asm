@@ -63,6 +63,8 @@ LoadSprites:
     sta playerY
     lda PLAYER_SPRITE_1X
     sta playerX
+    lda #$00
+    sta playerPalette
 
     lda #%10110000
     sta $2000

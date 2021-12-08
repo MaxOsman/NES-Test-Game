@@ -7,7 +7,7 @@ ShotLoopNextJump:
 EnemyLoopNextJump:
 	jmp EnemyLoopNext
 
-Collisions:
+EnemyCollisions:
 ; Increment Y first until end, then increment X by 1
 ; X - shot counter, Y - enemy counter, 0 - enemyY, 1 - enemyX, 2 to 4 - temp
 	ldx #$00
@@ -19,6 +19,10 @@ ShotLoop:
 EnemyLoop:
 	lda enemyType, Y
 	beq EnemyLoopNextJump		; If inactive (zero), skip detection and continue
+	cmp #$08
+	beq EnemyLoopNextJump		; If dying, also skip
+	cmp #$09
+	beq EnemyLoopNextJump
 
 ; Detect collision
 ; Store centre Y coords
@@ -84,7 +88,7 @@ EnemyLoop:
 	sta enemyHP, Y
 	bcs SkipKill
 	; HP goes from 0, $FF is death
-	lda #$00
+	lda #$08
 	sta enemyType, Y
 SkipKill:
 	ldx work2
@@ -148,3 +152,80 @@ ShotHitboxHeight:
 	.byte $0E, $0E, $08
 PWeaponDamages:
 	.byte $01, $01, $04
+
+
+PlayerCollisions:
+; X - shot counter, 0 - playerY, 1 - playerX, 2 to 4 - temp
+	ldx #$00
+
+EWeaponLoop:
+	lda eweaponState, X
+	beq EWeaponLoopNext	; If inactive (zero), skip detection and continue
+
+; Detect collision
+; Store centre Y coords
+	lda playerY
+	clc
+	adc #$07
+	sta work0
+	lda eweaponY, X
+	adc #$07			; A contains centre Y of shot
+
+; Compare Y coords
+	sec
+	sbc work0
+	jsr GetAbsolute
+	sta work3
+	lda #$0E			; Magic number
+	sta work4
+	lda work3
+	cmp work4			; Distance between hitbox centers
+	bcs	EWeaponLoopNext	; Leave early if no collision vertically
+
+; Store centre X coords
+	lda playerX
+	adc #$07
+	sta work1
+	lda eweaponX, X
+	adc #$03			; A contains centre X of shot
+
+; Compare X coords
+	sec
+	sbc work1
+	jsr GetAbsolute
+	sta work3
+	lda #$0A			; Magic number
+	sta work4
+	lda work3
+	cmp work4			; Distance between hitbox centers
+	bcs	EWeaponLoopNext	; Leave early if no collision horizontally
+
+; Collision response!
+	; Take damage
+	lda #$10
+	sta playerFlashTimer
+	lda #$00
+	sta playerPalette
+
+	; Delete EWeapon
+	sta eweaponState, X
+	lda #$FF
+	sta eweaponY, X
+
+	;lda enemyHP, Y
+	;stx work2
+	;ldx playerPower
+	;sec
+	;sbc PWeaponDamages, X
+	;sta enemyHP, Y
+	;bcs SkipKill
+	; HP goes from 0, $FF is death
+	;lda #$00
+	;sta enemyType, Y
+
+EWeaponLoopNext:
+	inx
+	cpx #$10
+	bne EWeaponLoop
+	; Has reached end
+	rts

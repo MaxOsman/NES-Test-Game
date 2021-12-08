@@ -22,11 +22,12 @@
 
 GameLoop:
 
-    jsr Movement        ; Player character actions
-    jsr NPCMovement     ; Shots
-    jsr AssembleSprites ; Put 2nd sprite next to the 1st one
-    jsr ReadController  ; $4016 stuff
-    jsr Collisions      ; Shots on enemies
+    jsr Movement            ; Player character actions
+    jsr NPCMovement         ; Shots
+    jsr AssembleSprites     ; Put 2nd sprite next to the 1st one
+    jsr ReadController      ; $4016 stuff
+    jsr EnemyCollisions     ; Shots on enemies
+    jsr PlayerCollisions    ; Shots on player
 
     lda #$01
     sta hasCompletedGameLoop

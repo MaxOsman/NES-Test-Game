@@ -29,6 +29,19 @@ ReadController:
 
 Movement:
 
+; Flash when hit
+	lda playerFlashTimer
+	; Skip if timer has reached zero
+	beq SkipPlayerFlash
+
+	dec playerFlashTimer
+	inc playerPalette
+	lda playerPalette
+	; Clamp to 0-3 range
+	and #%00000011
+	sta playerPalette
+SkipPlayerFlash:
+
 ; Hold left
 	lda controller
 	and #BUTTON_LEFT

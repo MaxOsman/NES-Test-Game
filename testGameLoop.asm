@@ -76,6 +76,11 @@ MoveEnemy1:
 	and #%00000011
 	sta enemyPalette, X
 SkipFlash:
+; Go to next enemy if wrong type
+	lda enemyType, X
+	cmp #$01
+	bne MoveEnemy2
+
 ; Roll RNG, all enemies will need to do this so put it here
 	jsr PRNG
 
@@ -128,10 +133,6 @@ CreateEWeapon:
 	ldx work0
 
 SkipEWeapon:
-; Go to next enemy if wrong type
-	lda enemyType, X
-	cmp #$01
-	bne MoveEnemy2
 
 ; Move E1
 	inc enemyTimer, X
@@ -166,11 +167,39 @@ MoveE1Reset:
 
 MoveEnemy2:
 	; Temp, no enemy 2 or beyond yet
+	lda enemyType, X
+	cmp #$02
+	bne AnimateExplosion
+
+	jmp ReturnToEnemyLoop
+
+AnimateExplosion:
+	lda enemyType, X
+	cmp #$09
+	beq AnimateExplosion2
+
+	lda enemyFlashTimer, X
+	cmp #$08
+	beq AnimateExplosionChange
+	jmp ReturnToEnemyLoop
+
+AnimateExplosionChange:
+	lda #$09
+	sta enemyType, X
+	jmp ReturnToEnemyLoop
+
+AnimateExplosion2:
+	lda enemyFlashTimer, X
+	cmp #$00
+	bne ReturnToEnemyLoopJump
+	; Erase enemy
+	lda #$00
+	sta enemyType, X
 	jmp ReturnToEnemyLoop
 
 AttackTimes:
     .byte $00, $F0, $00, $00, $00, $00, $00, $00
-	
+
 
 AssembleSprites:
 
@@ -183,6 +212,10 @@ AssembleSprites:
 	lda playerY
 	sta PLAYER_SPRITE_1Y
 	sta PLAYER_SPRITE_2Y
+	lda playerPalette
+	sta PLAYER_SPRITE_1ATTR
+	adc #$40
+	sta PLAYER_SPRITE_2ATTR
 
 ; PWeapon sprites
 	ldy #$00
@@ -208,7 +241,6 @@ AssembleSprites:
 	stx work0
 	ldx enemyType, Y
 ContinueEnemyLoop:
-	;sty work1
 	stx work2
 	lda EnemyTiles, X
 	asl work2
@@ -226,7 +258,6 @@ ContinueEnemyLoop:
 	sta ENEMY_SPRITE_2ATTR, X
 	lda work3
 	sta ENEMY_SPRITE_1ATTR, X
-	;ldy work1
 
 	lda enemyY, Y
 	sta ENEMY_SPRITE_1Y, X
@@ -272,7 +303,7 @@ EndEnemyLoop:
 ; %00000001, %01000001
 
 EnemyTiles:
-	.byte $FE, $02, $0E, $1A, $00, $00, $00, $00
+	.byte $FE, $02, $0E, $1A, $00, $00, $00, $00, $20, $1E
 EnemyAttr:
 	.byte %00000000, %00000000
 	.byte %00000000, %01000000
@@ -282,3 +313,5 @@ EnemyAttr:
 	.byte %00000000, %00000000
 	.byte %00000000, %00000000
 	.byte %00000000, %00000000
+	.byte %00000000, %01000000
+	.byte %00000000, %01000000
