@@ -41,6 +41,11 @@ eweaponX = $C0				; $C0 to $D0, 16
 playerPalette = $D0
 playerFlashTimer = $D1
 
+backgroundScroll = $D2
+PPUCTRL = $D3
+paletteCycleTimer = $D4
+paletteCycleIndex = $D5
+
 work0 = $F0
 work1 = $F1
 work2 = $F2
@@ -49,6 +54,7 @@ work4 = $F4
 
 hasCompletedGameLoop = $0400
 tempA = $0401
+tempX = $0402
 
 BUTTON_A      = 1 << 7
 BUTTON_B      = 1 << 6

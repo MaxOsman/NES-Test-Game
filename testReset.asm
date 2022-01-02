@@ -39,6 +39,7 @@ CLEARMEM:
 
     nop
 
+    ; Point PPUADDR to palette address
     lda #$3F
     sta $2006
     lda #$00
@@ -66,11 +67,6 @@ LoadSprites:
     lda #$00
     sta playerPalette
 
-    lda #%10110000
-    sta $2000
-    lda #%00011110
-    sta $2001
-
     ; Default seed
     ; Lol
     lda #$13
@@ -78,6 +74,13 @@ LoadSprites:
     lda #$37
     sta seed1
 
+    jsr LoadBackground
     jsr LoadLevelMap
+
+    lda #%10110000
+    sta $2000
+    sta PPUCTRL
+    lda #%00011110
+    sta $2001
 
     cli

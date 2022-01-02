@@ -124,3 +124,112 @@ InitHP:
 	.byte $00, $07, $00, $00, $00, $00, $00, $00
 InitPalettes:
 	.byte $00, $00
+
+
+LoadBackground:
+	; Point PPUADDR to nametable 0
+	; 0 - Random counter, 1 - Temp Y, 2 - 16 bit counter, 3 - jank, 4 - Do 2nd nametable?
+	lda #$20
+	sta $2006
+	lda #$00
+	sta $2006
+
+	sta work4
+RestartBackground:
+	ldy #$00
+	ldx #$00
+	sty work2
+	sty work3
+BackgroundLoop:
+	sty work1
+	jsr PRNG
+	and #%01111000
+	beq BackgroundLoop
+	sta work0
+	ldy work1
+BackgroundLoop2:
+	lda #$00
+	sta $2007
+
+	jsr BackgroundLoopIncrement
+	lda work3
+	bne BackgroundLoopFinish
+
+	inx
+	cpx work0
+	bne BackgroundLoop2
+
+	; Place star
+	lda #$25
+	sta $2007
+
+	jsr BackgroundLoopIncrement
+	lda work3
+	bne BackgroundLoopFinish
+
+	ldx #$00
+	jmp BackgroundLoop
+
+BackgroundLoopIncrement:
+	; Total number of tiles placed
+	iny
+	cpy #$40
+	beq BackgroundLoopIncrement2
+
+	rts
+	
+BackgroundLoopIncrement2:
+	ldy #$00
+	inc work2
+	lda work2
+	cmp #$0D
+	bne BackgroundLoopIncrement3
+	inc work3
+BackgroundLoopIncrement3:
+	rts
+
+BackgroundLoopFinish:
+	inc work4
+	lda work4
+	cmp #$02
+	beq LoadAttributes
+
+	; 2nd nametable
+	lda #$24
+	sta $2006
+	lda #$00
+	sta $2006
+
+	jmp RestartBackground
+
+LoadAttributes:
+	; Point PPUADDR to attribute table 0
+	lda #$23
+	sta $2006
+	lda #$C0
+	sta $2006
+
+	lda #$00
+	sta work4
+RestartAttr:
+	ldx #$00
+AttributeLoop:
+	lda #%01010101		; Background palette 1 in all 4 quadrants
+	sta $2007
+	inx
+	cpx #$40
+	bne AttributeLoop
+
+	; 2nd attr table
+	inc work4
+	lda work4
+	cmp #$02
+	beq FinishAttr
+	; Loop attr once
+	lda #$27
+	sta $2006
+	lda #$C0
+	sta $2006
+	jmp RestartAttr
+FinishAttr:
+	rts
